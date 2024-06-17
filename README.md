@@ -1,1 +1,1 @@
-Just a simple pawnchess game played in the terminal, but it's dynamic!
+Just a simple TicTacToe game played in the terminal, but it's dynamic!
