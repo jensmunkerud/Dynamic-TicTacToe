@@ -1,34 +1,46 @@
 #include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
+#include <vector>
 using namespace std;
 
+int mapSize = 4;
+int consecutiveToWin = 3;
 string playerA = "Cross";
 string playerB = "Circle";
 char emptyChar = ' ';
+char alphabet[26] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 struct position {
 	int x;
 	int y;
 };
-// Comments
 
-char board[3][3] = {{emptyChar, emptyChar, emptyChar}, 
-					{emptyChar, emptyChar, emptyChar},
-					{emptyChar, emptyChar, emptyChar}};
+vector<vector<char>> board(mapSize, vector<char>(mapSize, emptyChar));
 
+string repeatStr(string str, int n) {
+	string result;
+	for (int i = 0; i < n; i++) {
+		result.append(str);
+	}
+	return result;
+}
 
-void printBoard(char board[3][3]) {
+void printBoard(vector<vector<char>> board) {
 	// Prints out abc row
-	cout << "\n  a b c \n +-+-+-+\n1";
-	
+	cout << "\n  ";
+	for (int i = 0; i < mapSize; i++) {
+		cout << alphabet[i] << " ";
+	}
+	cout << "\n " << repeatStr("+-", mapSize) << "+\n1";
+
 	// Prints out cells
-	for (int row = 0; row < 3; row++) {
-		for (int col = 0; col < 3; col++) {
+	for (int row = 0; row < mapSize; row++) {
+		for (int col = 0; col < mapSize; col++) {
 			cout << "|" << board[row][col];
 		}
 		// Ternary operator (aka shorthand IF statement) counts rows
-		string hey = (row + 1 < 3) ? to_string(row + 2) : "";
-		cout << "|\n +-+-+-+\n" << hey;
+		string hey = (row + 1 < mapSize) ? to_string(row + 2) : "";
+		cout << "|\n " << repeatStr("+-", mapSize) << "+\n" << hey;
 	}
 }
 
@@ -41,64 +53,47 @@ bool isValidMove(char board[3][3], int coord) {
 
 position decodeMove(char a, int b) {
 	position result;
-	switch (a) {
-		case 'a':
-			result.x= 0;
-			break;
-		case 'b':
-			result.x = 1;
-			break;
-		case 'c':
-			result.x = 2;
-			break;
+	for (int i = 0; i < sizeof(alphabet); i++) {
+		if (alphabet[i] == a) {
+			result.x = i;
+		}
 	}
 
-	switch (b) {
-		case 1:
-			result.y = 0;
-			break;
-		case 2:
-			result.y = 1;
-			break;
-		case 3:
-			result.y = 2;
-			break;
-	}
+	result.y = b - 1;
 	return result;
 }
 
-void makeMove(char board[3][3], position move, bool crossTurn) {
+void makeMove(vector<vector<char>> board, position move, bool crossTurn) {
 	board[move.y][move.x] = crossTurn ? 'x' : 'o';
 	printBoard(board);
-
 }
 
-string hasAnyoneWon(char board[3][3]) {
+string hasAnyoneWon(vector<vector<char>> board) {
 	string winner = "none";
 	// return either cross, circle or none
-	for (int row = 0; row < 3; row ++) {
-		for (int col = 0; col < 3; col ++) {
+	for (int row = 0; row < mapSize; row ++) {
+		for (int col = 0; col < mapSize; col ++) {
 			// To make this scalable, i have to use some for loop or smthn to check
 			// if we have a winner, for longer than 3...
 
 			// Horizontal check
-			if (col <= 0 && board[row][col] == board[row][col + 1] && board[row][col + 1] == board[row][col + 2] && board[row][col] != emptyChar) {
+			if (col <= (mapSize - consecutiveToWin) && board[row][col] == board[row][col + 1] && board[row][col + 1] == board[row][col + 2] && board[row][col] != emptyChar) {
 				winner = board[row][col] == 'x' ? playerA : playerB;
 			}
 
 			// Vertical check
-			if (row <= 0 && board[row][col] == board[row + 1][col] && board[row + 1][col] == board[row + 2][col] && board[row][col] != emptyChar) {
+			if (row <= (mapSize - consecutiveToWin) && board[row][col] == board[row + 1][col] && board[row + 1][col] == board[row + 2][col] && board[row][col] != emptyChar) {
 				winner = board[row][col] == 'x' ? playerA : playerB;
 			}
 
 			// Obliquely right
-			if (row <= 0 && col <= 0 && board[row][col] == board[row + 1][col + 1] && board[row + 1][col + 1] == board[row + 2][col + 2] && board[row][col] != emptyChar) {
+			if (row <= (mapSize - consecutiveToWin) && col <= (mapSize - consecutiveToWin) && board[row][col] == board[row + 1][col + 1] && board[row + 1][col + 1] == board[row + 2][col + 2] && board[row][col] != emptyChar) {
 				winner = board[row][col] == 'x' ? playerA : playerB;
 				cout << "obliquely right\n";
 			}
 
 			// Obliquely left
-			if (row <= 0 && col >= 2 && board[row][col] == board[row + 1][col - 1] && board[row + 1][col - 1] == board[row + 2][col - 2] && board[row][col] != emptyChar) {
+			if (row <= (mapSize - consecutiveToWin) && col >= consecutiveToWin - 1 && board[row][col] == board[row + 1][col - 1] && board[row + 1][col - 1] == board[row + 2][col - 2] && board[row][col] != emptyChar) {
 				winner = board[row][col] == 'x' ? playerA : playerB;
 				cout << "obliquely left\n";
 			}
@@ -118,7 +113,6 @@ int main() {
 		int b = 0;
 		cout << (crossTurn ? playerA : playerB) << " turn: \n";
 		cin >> a >> b;
-
 
 		system("clear");
 		makeMove(board, decodeMove(a, b), crossTurn);
