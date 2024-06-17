@@ -112,6 +112,19 @@ int main() {
 		string input;
 		cin >> input;
 
+		if (input == "resize") {
+			while (true) {
+				cin >> input;
+				if (input == "play") {
+					break;
+				} else {
+					mapSize = stoi(input);
+					system("clear");
+					printBoard(board);
+				}
+			}
+		}
+
 		if (input.length() < 2 || !isalpha(input[0])) {
 						system("clear");
 						printBoard(board);
