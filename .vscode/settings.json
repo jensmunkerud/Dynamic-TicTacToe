@@ -1,0 +1,11 @@
+{
+	"files.associations": {
+		"*.py": "python",
+		"iostream": "cpp",
+		"__locale": "cpp",
+		"ios": "cpp",
+		"__bit_reference": "cpp",
+		"vector": "cpp",
+		"string": "cpp"
+	}
+}

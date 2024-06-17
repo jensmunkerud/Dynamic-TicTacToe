@@ -4,7 +4,7 @@
 #include <vector>
 using namespace std;
 
-int mapSize = 9;
+int mapSize = 16;
 int consecutiveToWin = 3;
 string playerA = "Cross";
 string playerB = "Circle";
@@ -26,12 +26,13 @@ string repeatStr(string str, int n) {
 }
 
 void printBoard(vector<vector<char>> board) {
+	string smallIndent = (mapSize >= 10) ? " " : "";
 	// Prints out abc row
-	cout << "\n  ";
+	cout << "\n  " << smallIndent;
 	for (int i = 0; i < mapSize; i++) {
 		cout << alphabet[i] << " ";
 	}
-	cout << "\n " << repeatStr("+-", mapSize) << "+\n1";
+	cout << "\n " << smallIndent << repeatStr("+-", mapSize) << "+\n1" << smallIndent;
 
 	// Prints out cells
 	for (int row = 0; row < mapSize; row++) {
@@ -40,12 +41,12 @@ void printBoard(vector<vector<char>> board) {
 		}
 		// Ternary operator (aka shorthand IF statement) counts rows
 		string hey = (row + 1 < mapSize) ? to_string(row + 2) : "";
-		cout << "|\n " << repeatStr("+-", mapSize) << "+\n" << hey;
+		cout << "|\n " << smallIndent << repeatStr("+-", mapSize) << "+\n" << hey << ((row < 8) ? " " : "");
 	}
 }
 
-bool isValidMove(char board[3][3], int coord) {
-	if (board[coord][coord] != emptyChar) {
+bool isValidMove(vector<vector<char>> board, position move) {
+	if (board[move.y][move.x] != emptyChar) {
 		return false;
 	}
 	return true;
@@ -89,20 +90,16 @@ string hasAnyoneWon(vector<vector<char>> board) {
 			// Obliquely right
 			if (row <= (mapSize - consecutiveToWin) && col <= (mapSize - consecutiveToWin) && board[row][col] == board[row + 1][col + 1] && board[row + 1][col + 1] == board[row + 2][col + 2] && board[row][col] != emptyChar) {
 				winner = board[row][col] == 'x' ? playerA : playerB;
-				cout << "obliquely right\n";
 			}
 
 			// Obliquely left
 			if (row <= (mapSize - consecutiveToWin) && col >= consecutiveToWin - 1 && board[row][col] == board[row + 1][col - 1] && board[row + 1][col - 1] == board[row + 2][col - 2] && board[row][col] != emptyChar) {
 				winner = board[row][col] == 'x' ? playerA : playerB;
-				cout << "obliquely left\n";
 			}
 		}
 	}
 	return winner;
 }
-
-
 
 int main() {
 	bool crossTurn = true;
@@ -110,10 +107,45 @@ int main() {
 	printBoard(board);
 
 	while (hasAnyoneWon(board) == "none") {
-		char a = 'a';
-		int b = 0;
 		cout << (crossTurn ? playerA : playerB) << " turn: \n";
-		cin >> a >> b;
+
+		string input;
+		cin >> input;
+
+		if (input.length() < 2 || !isalpha(input[0])) {
+						system("clear");
+						printBoard(board);
+						cout << "Invalid input. Please enter a letter followed by a number.\n";
+						continue;
+				}
+
+		char a = input[0];
+		int b;
+
+		try {
+			b = stoi(input.substr(1));
+		} catch (exception& e) {
+			system("clear");
+			printBoard(board);
+			cout << "Invalid input. Please enter a valid number after the letter.\n";
+			continue;
+		}
+
+		if (b <= 0 || b > mapSize) {
+						system("clear");
+						printBoard(board);
+						cout << "Invalid input. Please enter a number between 1 and " << mapSize << ".\n";
+						continue;
+				}
+
+
+		// Handles positions that are already taken
+		if (!isValidMove(board, decodeMove(a, b))) {
+			system("clear");
+			printBoard(board);
+			cout << "That was an invalid move\n";
+			continue;
+		}
 
 		system("clear");
 		board = makeMove(board, decodeMove(a, b), crossTurn);
