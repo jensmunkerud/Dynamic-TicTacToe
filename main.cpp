@@ -4,7 +4,7 @@
 #include <vector>
 using namespace std;
 
-int mapSize = 4;
+int mapSize = 9;
 int consecutiveToWin = 3;
 string playerA = "Cross";
 string playerB = "Circle";
@@ -58,14 +58,14 @@ position decodeMove(char a, int b) {
 			result.x = i;
 		}
 	}
-
 	result.y = b - 1;
 	return result;
 }
 
-void makeMove(vector<vector<char>> board, position move, bool crossTurn) {
+vector<vector<char>> makeMove(vector<vector<char>> board, position move, bool crossTurn) {
 	board[move.y][move.x] = crossTurn ? 'x' : 'o';
 	printBoard(board);
+	return board;
 }
 
 string hasAnyoneWon(vector<vector<char>> board) {
@@ -108,6 +108,7 @@ int main() {
 	bool crossTurn = true;
 	system("clear");
 	printBoard(board);
+
 	while (hasAnyoneWon(board) == "none") {
 		char a = 'a';
 		int b = 0;
@@ -115,7 +116,7 @@ int main() {
 		cin >> a >> b;
 
 		system("clear");
-		makeMove(board, decodeMove(a, b), crossTurn);
+		board = makeMove(board, decodeMove(a, b), crossTurn);
 
 		crossTurn = ! crossTurn;
 		// sleep(1);
