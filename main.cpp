@@ -4,7 +4,7 @@
 #include <vector>
 using namespace std;
 
-int mapSize = 16;
+int mapSize = 3;
 int consecutiveToWin = 3;
 string playerA = "Cross";
 string playerB = "Circle";
@@ -41,7 +41,7 @@ void printBoard(vector<vector<char>> board) {
 		}
 		// Ternary operator (aka shorthand IF statement) counts rows
 		string hey = (row + 1 < mapSize) ? to_string(row + 2) : "";
-		cout << "|\n " << smallIndent << repeatStr("+-", mapSize) << "+\n" << hey << ((row < 8) ? " " : "");
+		cout << "|\n " << smallIndent << repeatStr("+-", mapSize) << "+\n" << hey << ((row < 8 && mapSize >= 10) ? " " : "");
 	}
 }
 
